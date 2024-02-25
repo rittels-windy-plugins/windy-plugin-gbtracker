@@ -66,6 +66,7 @@ export default {
         exclude: ['src/globalCss.js', 'node_modules/**'],
         clearScreen: false,
     },
+
     plugins: [
         watchGlobs([
             'src/*.less'
