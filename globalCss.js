@@ -40,6 +40,7 @@ export const makeGlobalCss = function () {
         async buildStart() {
             const config = (await tsImport.load('./src/pluginConfig.ts')).default;
             const { name } = config;
+
             let lessFile = "./src/global.less";
             try {
                 let lessContent;

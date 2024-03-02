@@ -61,6 +61,7 @@ export default {
         /* We disable all warning messages */
     },
     external: id => id.startsWith('@windy/'),
+
     watch: {
         include: ['src/**', 'examples/**'],
         exclude: ['src/globalCss.js', 'node_modules/**'],
@@ -117,5 +118,6 @@ export default {
         }),
     ],
 };
+
 
 
