@@ -3,13 +3,12 @@
 </div>
 <section class="plugin__content">
     <div
-        class="plugin__title plugin__title--chevron-back inlined"
+        class="plugin__title plugin__title--chevron-back"
         on:click={() => bcast.emit('rqstOpen', 'menu')}
     >
         Elevation and Density Altitude
-
     </div>
-    <div class="closing-x" on:click={closeCompletely}>  </div>
+    <div class="closing-x" on:click={closeCompletely}></div>
     <div>
         <br />
         Shows elevation at picker position.<br /><br />
@@ -103,7 +102,7 @@
     let refs = {};
     let node;
 
-    let pickerT, embedbox ;
+    let pickerT, embedbox;
 
     let pressure, temp, dewP, rh, pa, da, da_corr_dp, da_dp;
     let wxdata;
@@ -129,22 +128,22 @@
     console.log(timer);
 
     function loadReqPlugin(url, name, exports) {
-        if (plugins[name] &&  (plugins[name].isActive || plugins[name].isOpen)) return plugins[name].exports;
+        if (plugins[name] && (plugins[name].isActive || plugins[name].isOpen))
+            return plugins[name].exports;
         // .open(),  does not remove other plugins from embed window
-        console.log("exp",exports);
-        return installExternalPlugin(url).then(() => plugins[name].open()).then(() => plugins[name].exports);
+        console.log('exp', exports);
+        return installExternalPlugin(url)
+            .then(() => plugins[name].open())
+            .then(() => plugins[name].exports);
     }
 
     const moduleLoadPromises = [
         loadReqPlugin(
             //   'https://localhost:9998/plugin.js',
-            'https://www.flymap.org.za/windy_plugins/pickertools/plugin.min.js',
+            'https://www.flymap.org.za/windy_plugins/pickertools/plugin.min.js?'+Date.now(),
             'windy-plugin-picker-tools',
         ),
-        loadReqPlugin(
-            'https://localhost:9997/plugin.js',
-            'windy-plugin-embedbox',
-        )
+        loadReqPlugin('https://localhost:9997/plugin.js', 'windy-plugin-embedbox'),
     ];
 
     onMount(() => {
@@ -157,13 +156,30 @@
         insertGlobalCss();
 
         Promise.all(moduleLoadPromises).then(mods => {
-            ([pickerT, embedbox]  = mods);
+            [pickerT, embedbox] = mods;
             console.log(Date.now() - timer);
             //pickerT = plugins['windy-plugin-picker-tools'].exports;
 
             console.log('all plugins loaded', pickerT, embedbox);
 
-            embedbox.html("<div>hellow world</div>");
+            embedbox.setHTML(
+                `<div>
+                    The <span class='open-plugin' style='color:red; cursor:pointer;'>Density Altitude</span> 
+                    plugin is still <b>Active</b>, despite the right hand pane being closed.   
+                    To completely close the Density Alt plugin,  
+                    you can click the closing-x of the embedded window. 
+                </div>`,
+                name,
+            );
+
+            console.log(embedbox);
+            console.log(u$('.open-plugin', embedbox.node));
+            setTimeout(() => {
+                console.log(u$('.open-plugin', embedbox.node));
+                u$('.open-plugin', embedbox.node)?.addEventListener('click', () =>
+                    bcast.fire('rqstOpen', name),
+                );
+            });
 
             if (pickerT && pickerT.getActivePlugin() != name) {
                 console.log('removing previous plugin stuff from picker');
@@ -196,6 +212,7 @@
     });
 
     //dont think needed
+    /*
     function initModules() {
         //they may have been closed,  so reopen them. This is to mount the css and html.
         return Promise.all(pluginsNeeded.map(p => plugins[p].open())).then(() => {
@@ -212,17 +229,18 @@
                 pickerT.setActivePlugin(name);
             }
 
-            /*
-        let pparams = pickerT?.getParams();
-        if (pparams) {//check if picker already open
-            console.log("yes open", pparams);
-            lastpos = pparams;
-            console.log(lastpos);
-            fetchData(lastpos);
-        }
-        */
+            
+        //let pparams = pickerT?.getParams();
+        //if (pparams) {//check if picker already open
+        //    console.log("yes open", pparams);
+        //    lastpos = pparams;
+        //    console.log(lastpos);
+        //    fetchData(lastpos);
+        //}
+        
         });
     }
+    */
 
     function getChoices() {
         let sv = store.get('plugin-da-selected-vals');
@@ -242,27 +260,25 @@
         }
     };
 
-    onDestroy(message => {
-        console.log(message);
-        //removeGlobalCss();
-
-        //needs work
-        if (!message || !message.ev) return;
+    onDestroy(() => {
+        //rhpane is closed,  but nothing else happens.
     });
 
     const closeCompletely = function () {
         console.log('close completely');
-        //if message.ev is defined:  close completely:
+        
         pickerT.dragOff(fetchData);
-        //bcast.fire('rqstClose', 'windy-plugin-picker-tools');
+        
         pickerT.closeCompletely();
-        //bcast.fire('rqstClose', 'infobox');
+        bcast.fire('rqstClose','windy-plugin-embedbox');
+
         bcast.off('metricChanged', onMetricChanged);
         picker.off('pickerOpened', fetchData);
         picker.off('pickerMoved', pickerMoved);
 
         store.off('timestamp', setTs);
         store.off('product', setProd);
+        bcast.fire('rqstClose', name);
         hasHooks = false;
     };
 
@@ -553,3 +569,4 @@
 <style lang="less">
     @import 'da.less';
 </style>
+
