@@ -127,11 +127,10 @@
     let timer = Date.now();
     console.log(timer);
 
-    function loadReqPlugin(url, name, exports) {
+    function loadReqPlugin(url, name) {
         if (plugins[name] && (plugins[name].isActive || plugins[name].isOpen))
             return plugins[name].exports;
         // .open(),  does not remove other plugins from embed window
-        console.log('exp', exports);
         return installExternalPlugin(url)
             .then(() => plugins[name].open())
             .then(() => plugins[name].exports);
