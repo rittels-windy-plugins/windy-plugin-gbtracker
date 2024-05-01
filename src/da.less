@@ -1,54 +1,120 @@
-.plugin__content {
+@name  : windy-plugin-da;
+@width : 350px;
+@bottom: 150px;
 
-    padding    : 10px 10px 10px 10px;
-    font-size  : 13px;
-    line-height: 1;
-
-    .plugin__title {
-        font-size    : 22px !important;
-        margin-bottom: 10px;
+.add-scroll-bar {
+    &::-webkit-scrollbar {
+        width: 8px;
     }
 
-    [data-ref="choose"] {
-        .checkbox {
-            display: block;
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, .5);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: 0 0;
+    }
+}
+
+#@{name}-info {
+
+    position     : fixed;
+    left         : 5px;
+    width        : @width;
+    top          : 5px;
+    bottom       : @bottom;
+    border-radius: 10px;
+    box-sizing   : border-box;
+    padding      : 5px 0px;
+    font-size    : 13px;
+    line-height  : 1;
+
+    .closing-x {
+        display  : block;
+        right    : -15px;
+        top      : -10px;
+        font-size: 30px;
+        margin   : 5px;
+    }
+
+    .corner-handle {
+        box-sizing : border-box;
+        height     : 40px;
+        width      : 40px;
+        position   : absolute;
+        margin-left: -18px;
+        margin-top : -18px;
+        left       : 100%;
+        top        : 100%;
+        cursor     : nwse-resize;
+
+        &::before {
+            content                   : ' ';
+            box-sizing                : border-box;
+            position                  : absolute;
+            left                      : 0px;
+            top                       : 0px;
+            width                     : 20px;
+            height                    : 20px;
+            border-bottom             : 5px solid rgba(230, 230, 230, .5);
+            border-right              : 5px solid rgba(230, 230, 230, .5);
+            border-bottom-right-radius: 10px;
+            background-color          : transparent;
         }
     }
 
-    .toggle-section {
-        font-size: 15px;
+    .scrollable {
 
-        &.checkbox {
-            &::before {
-                content  : '\25B7\00a0\00a0';
-                top      : -0.1em;
-                font-size: 0.8em;
+        box-sizing: border-box;
+        position  : relative;
+        height    : 100%;
+        width     : 100%;
+        padding   : 5px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        .add-scroll-bar();
+
+        // end of boilerplate
+
+        .plugin__title {
+            font-size    : 22px !important;
+            margin-bottom: 10px;
+        }
+
+        [data-ref="choose"] {
+            .checkbox {
+                display: block;
             }
+        }
 
-            &+* {
-                display: none;
-            }
+        .toggle-section {
+            font-size    : 15px;
+            margin-bottom: 3px;
 
-            &.off {
+            &.checkbox {
                 &::before {
-                    content  : "\25BD\00a0\00a0";
+                    content  : '\25B7\00a0\00a0';
                     top      : -0.1em;
                     font-size: 0.8em;
                 }
 
                 &+* {
-                    display: block;
+                    display: none;
+                }
+
+                &.off {
+                    &::before {
+                        content  : "\25BD\00a0\00a0";
+                        top      : -0.1em;
+                        font-size: 0.8em;
+                    }
+
+                    &+* {
+                        display: block;
+                    }
                 }
             }
         }
-
     }
 }
-
-.closing-x {
-    display  : block;
-    right    : 0px;
-    top      : 0.25em;
-    font-size: 30px;
-}
-

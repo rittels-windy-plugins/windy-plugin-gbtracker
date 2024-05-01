@@ -6,33 +6,41 @@ import { map } from '@windy/map';
 import store from '@windy/store';
 import bcast from '@windy/broadcast';
 import { emitter as picker } from '@windy/picker';
-import http from '@windy/http';
-import rs from '@windy/rootScope';
-//import pluginDataLoader from '@plugins/plugin-data-loader';
+//import http from '@windy/http';
+//import rs from '@windy/rootScope';
 import ftch from '@windy/fetch';
 import interpolator from '@windy/interpolator';
 
-import config from './pluginConfig';
-import { loadPlugins } from './loadPlugins.js';
+import * as  singleclick from '@windy/singleclick';
 
+import config from './pluginConfig';
 
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
-const { title, name } = config;
+import { getPickerMarker } from './picker.js';
+
+const { name } = config;
 const { $, getRefs } = utils;
 
 let thisPlugin, refs, node;
 
 let hasHooks;
-let pickerT, embedbox;
-
+let pickerT;
 
 function init(plgn) {
-
     thisPlugin = plgn;
-    thisPlugin.isActive = true;
+
     ({ node } = plgn.window);
     ({ refs } = getRefs(node));
+
+    // important to close picker
+    bcast.fire('rqstClose', 'picker');
+
+    //??? should I open my picker if windy picker was open
+
+    pickerT = getPickerMarker();
+
+    // add[Right|Left]Plugin is done by focus
 
     // todo move this to svelte later 
     let choices = getChoices();
@@ -40,74 +48,76 @@ function init(plgn) {
         c[i].classList[choices[i] == 0 ? 'add' : 'remove']('checkbox--off');
     }
     refs.choose.addEventListener('click', onChoose);
-    // 
-
-    loadPlugins().then(mods => ({ pickerT, embedbox } = mods)).then(() => {
-        embedbox.setHTML(
-            `<div>
-                    The <span data-ref='open-plugin' style='color:red; cursor:pointer;'>Density Altitude</span> 
-                    plugin is still <b>Active</b>, despite the right hand pane being closed.   
-                     
-                </div>`,
-            name,
-        )
-            .then(({ refs }) => {
-                refs['open-plugin']?.addEventListener('click', () =>
-                    bcast.fire('rqstOpen', name),
-                );
-            });
-        // this will not be doubled if already done: 
-        pickerT.drag(fetchData);
-        pickerT.addLeftPlugin(name);
-        pickerT.addRightPlugin(name);
-        let c = pickerT.getParams();
-        if (c) fetchData(c);
-    })
 
     if (hasHooks) return;
 
+    // click stuff
+    singleclick.singleclick.on(name, pickerT.openMarker);
+    bcast.on('pluginOpened', onPluginOpened);
+    bcast.on('pluginClosed', onPluginClosed);
+
     insertGlobalCss();
 
+    pickerT.onDrag(fetchData);
     picker.on('pickerOpened', fetchData);
     picker.on('pickerMoved', pickerMoved);
+
     store.on('timestamp', setTs);
     store.on('product', setProd);
+    setProd();
     bcast.on('metricChanged', onMetricChanged);
 
+    // neeeded???
     thisPlugin.closeCompletely = closeCompletely;
+
     hasHooks = true;
 };
 
-
 const closeCompletely = function () {
-    console.log('close completely');
+    console.log('DA close completely');
 
     removeGlobalCss();
 
-    pickerT.dragOff(fetchData);
+    pickerT.offDrag(fetchData);
+    picker.off('pickerOpened', fetchData);
+    picker.off('pickerMoved', pickerMoved);
     pickerT.remLeftPlugin(name);
     pickerT.remRightPlugin(name);
 
     bcast.off('metricChanged', onMetricChanged);
-    picker.off('pickerOpened', fetchData);
-    picker.off('pickerMoved', pickerMoved);
-
     store.off('timestamp', setTs);
     store.off('product', setProd);
 
-    thisPlugin.isActive = false;
-
-    embedbox.clearHTML(name);
+    // click stuff
+    singleclick.release(name, "high");
+    singleclick.singleclick.off(name, pickerT.openMarker);
+    bcast.off('pluginOpened', onPluginOpened);
+    bcast.off('pluginClosed', onPluginClosed);
 
     bcast.fire('rqstClose', name);
     hasHooks = false;
 };
 
+function onPluginOpened(p) {
+    // other external plugins do not get priority back,  when later reopened,  like better sounding.
+    if (W.plugins[p].listenToSingleclick && W.plugins[p].singleclickPriority == 'high') {
+        singleclick.register(p, 'high');
+    }
+}
+function onPluginClosed(p) {
+    // if the plugin closed has high singleclickpriority,  it returns single click to default picker,
+    // so instead register this plugin as priority high
+    if (p !== name && W.plugins[p].singleclickPriority == 'high') {
+        console.log("on plugin closed:", p, "  This plugin gets priority:", name);
+        singleclick.register(name, 'high');
+    }
+}
+
 export { init, closeCompletely };
 
 //
 
-let pressure, temp, dewP, rh, pa, da, da_corr_dp, da_dp;
+//let pressure, temp, dewP, rh, pa, da, da_corr_dp, da_dp;
 let wxdata;
 let prod = 'ecmwf';
 let lastpos;
@@ -125,11 +135,7 @@ let elevPntFcst;
 
 const K = -273.15;
 
-
-let ibox;
 let nVals = 11;
-
-let choices = [];
 
 let ts = Date.now();
 
@@ -157,14 +163,12 @@ export const onopen = params => {
     }
 };
 
-
 //read query data
 
 function useQuery(query) {
     let { lat, lng } = map.getCenter();
     if (query) {
         let q = query;
-
         for (let p in q) {
             switch (p.toUpperCase()) {
                 case 'DATE':
@@ -196,14 +200,15 @@ function setURL() {
 }
 
 function pickerMoved(e) {
-    if (pickerT.getActivePlugin() != name) return;
+    //if (pickerT.getActivePlugin() != name) return;
+    console.log(pickerMoved, e);
     elevfnd = datafnd = true;
     setTimeout(fetchData, 500, e);
 }
 
-function onMetricChanged(e) {
+function onMetricChanged() {
     let c = pickerT.getParams();
-    console.log(c);
+    console.log("metricChanged", c);
     if (c) {
         fetchData(c);
     }
@@ -364,8 +369,9 @@ function fetchData(c) {
     //console.log('now in fetch', pickerT.getActivePlugin(), name);
     //console.log(pickerT.getActivePlugin());
     //if (pickerT.getActivePlugin() != name) return;
+    console.log(c);
     lastpos = c;
-    c.model = prod;
+    //  c.model = prod;
     lefta -= 0.05;
     righta -= 0.05;
     if (lefta < 0.6) lefta = 0.6;

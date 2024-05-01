@@ -12,8 +12,7 @@ const { join } = path;
 let { log } = console;
 
 function template(name, css) {
-    return `
-const globalCss = `+
+    return `const globalCss = `+
 
  "`<style id='stylesheet-for-"+name+"'>"+css+"</style>`;"+
 
