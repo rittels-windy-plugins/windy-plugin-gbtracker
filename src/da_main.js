@@ -95,6 +95,12 @@ const closeCompletely = function () {
     bcast.off('pluginClosed', onPluginClosed);
 
     bcast.fire('rqstClose', name);
+
+    // other plugins will try to defocus this plugin.
+    delete thisPlugin.focus;
+    delete thisPlugin.defocus;
+
+    pickerT = null;  // in case plugin re-opened
     hasHooks = false;
 };
 
