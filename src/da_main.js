@@ -201,14 +201,12 @@ function setURL() {
 
 function pickerMoved(e) {
     //if (pickerT.getActivePlugin() != name) return;
-    console.log(pickerMoved, e);
     elevfnd = datafnd = true;
     setTimeout(fetchData, 500, e);
 }
 
 function onMetricChanged() {
     let c = pickerT.getParams();
-    console.log("metricChanged", c);
     if (c) {
         fetchData(c);
     }
@@ -229,7 +227,7 @@ function parseWxCode(c) {
 }
 
 function readChoices(lastClick) {
-    console.log('lastclick', lastClick);
+
     let choices = [...refs.choose.children].map(e => !e.classList.contains('checkbox--off'));
     if (choices.filter(e => e).length > 5) {
         let i;
@@ -237,7 +235,7 @@ function readChoices(lastClick) {
         choices[i] = false;
         [...refs.choose.children][i].classList.add('checkbox--off');
     }
-    console.log(choices, parseInt(choices.map(Number).join(''), 2));
+    
     store.set('plugin-da-selected-vals', parseInt(choices.map(Number).join(''), 2));
 }
 
@@ -257,7 +255,7 @@ function calculate() {
     if (wxdata) {
 
         elevPntFcst = wxdata.data.header.elevation;
-        console.log("elp", elp, elevPntFcst);
+        
         let elev = Math.round(elp.elev * 3.28084);
         if (elev < 0) elev = 0;
 
@@ -297,7 +295,7 @@ function calculate() {
             4.686035 -
             K;
 
-        console.log('temp', temp, 'wetBulb', wetBulb);
+        
 
         let deltaT = temp - wetBulb - K;
 
@@ -339,7 +337,7 @@ function calculate() {
             ldiv += '<br>';
         });
 
-        console.log('left div', ldiv);
+        
 
         if (pickerT.getLeftPlugin() == name)
             pickerT.fillLeftDiv(ldiv, true, { 'flex-basis': '50%' });
@@ -369,7 +367,7 @@ function fetchData(c) {
     //console.log('now in fetch', pickerT.getActivePlugin(), name);
     //console.log(pickerT.getActivePlugin());
     //if (pickerT.getActivePlugin() != name) return;
-    console.log(c);
+    
     lastpos = c;
     //  c.model = prod;
     lefta -= 0.05;
@@ -403,7 +401,7 @@ function fetchData(c) {
             });
     }
 
-    console.log(store.get('overlay'));
+
 
     if (store.get('overlay') == 'ccl') {
         interpolator(ip => {
@@ -416,7 +414,7 @@ function fetchData(c) {
         datafnd = false;
         ftch.getPointForecastData(store.get('product'), c)
             .then(data => {
-                console.log('DATA', data);
+                
                 wxdata = data;
                 wxdata.pos = c;
                 lefta = 1;
