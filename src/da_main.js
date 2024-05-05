@@ -206,6 +206,7 @@ function setURL() {
 }
 
 function pickerMoved(e) {
+    if (e.source == 'picker') return;  // only react on custom-picker
     //if (pickerT.getActivePlugin() != name) return;
     elevfnd = datafnd = true;
     setTimeout(fetchData, 500, e);
@@ -370,9 +371,7 @@ function calculate() {
 }
 
 function fetchData(c) {
-    //console.log('now in fetch', pickerT.getActivePlugin(), name);
-    //console.log(pickerT.getActivePlugin());
-    //if (pickerT.getActivePlugin() != name) return;
+    if (c.source == 'picker') return;  // only react on custom-picker
     
     lastpos = c;
     //  c.model = prod;

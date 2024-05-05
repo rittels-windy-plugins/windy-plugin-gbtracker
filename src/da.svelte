@@ -23,6 +23,7 @@
         }}
     ></div>
     <div bind:this={cornerHandle} data-ref="cornerHandle" class="corner-handle"></div>
+    <div bind:this={cornerHandleTop} data-ref="cornerHandleTop" class="corner-handle-top"></div>
 
     <div class="scrollable">
         <div class="plugin__title">Elevation, Density Altitude and Multipicker</div>
@@ -104,7 +105,7 @@
     import plugins from '@windy/plugins';
 
     import { init, closeCompletely } from './da_main.js';
-    import { addDrag, showInfo, getWrapDiv } from './infoWinUtils.js';
+    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle } from './infoWinUtils.js';
     import { getPickerMarker } from './picker.js';
 
     import config from './pluginConfig.js';
@@ -113,7 +114,7 @@
     const thisPlugin = plugins[name];
     let node;
     let mainDiv;
-    let cornerHandle;
+    let cornerHandle, cornerHandleTop;
     let closeButtonClicked;
 
     function focus() {
@@ -144,11 +145,9 @@
         const wrapDiv = getWrapDiv();
         wrapDiv.appendChild(mainDiv);
 
-        addDrag(cornerHandle, (x, y) => {
-            mainDiv.style.height = y + 'px';
-            mainDiv.style.width = x + 'px';
-        });
-
+        makeBottomRightHandle(cornerHandle, mainDiv);
+        makeTopLeftHandle(cornerHandleTop, mainDiv);
+       
         //// this should not be needed later
         node.querySelector(':scope > .closing-x').addEventListener(
             'click',
@@ -174,5 +173,5 @@
 </script>
 
 <style lang="less">
-    @import 'da.less?1714637819397';
+    @import 'da.less?1714942300856';
 </style>
