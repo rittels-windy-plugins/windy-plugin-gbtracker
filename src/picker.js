@@ -6,7 +6,6 @@ import bcast from '@windy/broadcast';
 import store from '@windy/store';
 import { t } from '@windy/trans';
 import rs from '@windy/rootScope';
-console.log(rs);
 
 import { $, copy2clipboard, debounce, logError, normalizeLatLon, throttle } from '@windy/utils';
 import { getLatLonInterpolator } from '@windy/interpolator';
@@ -218,7 +217,7 @@ function wrapLn(ln) {
 
 function setPickerLocation(coords) {
     let pickerLoc = coords ? { lat: coords.lat, lon: wrapLn(coords.lng) } : null;
-    console.log(pickerLoc);
+
     store.set('pickerLocation', pickerLoc);
 }
 
@@ -226,7 +225,6 @@ function getValuesAndRender() {
     // this method is throttled and debounced, marker can be closed already, chech it for to be sure
     const coords = marker.getLatLng();
     const values = interpolateLatLon({ lat: coords.lat, lon: coords.lng });
-    console.log("COOrds", coords, values);
     render(values, coords);
     setPickerLocation(coords);
 }
@@ -249,8 +247,8 @@ function getInterpolator() {
         // in mobile,  if mobile picker is open,  getInterpolator inside the mobile picker does nothing,  unless within a setTimeout.
         setTimeout(() => {
             getLatLonInterpolator().then((interFun) => {
-                console.log("try to show the func");
-                console.dir(interFun); 
+                //console.log("try to show the func");
+                //console.dir(interFun); 
                 interpolateLatLon = interFun;
                 resolve();
             })
@@ -259,7 +257,7 @@ function getInterpolator() {
 }
 
 function updateInterFun() {
-    console.log("update interfun called");
+    //console.log("update interfun called");
     getInterpolator().then(() => update());
 }
 

@@ -103,9 +103,16 @@
 
     import { onDestroy, onMount } from 'svelte';
     import plugins from '@windy/plugins';
+    import { map } from '@windy/map';
 
     import { init, closeCompletely } from './da_main.js';
-    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle } from './infoWinUtils.js';
+    import {
+        addDrag,
+        showInfo,
+        getWrapDiv,
+        makeBottomRightHandle,
+        makeTopLeftHandle,
+    } from './infoWinUtils.js';
     import { getPickerMarker } from './picker.js';
 
     import config from './pluginConfig.js';
@@ -116,6 +123,7 @@
     let mainDiv;
     let cornerHandle, cornerHandleTop;
     let closeButtonClicked;
+    let marker;
 
     function focus() {
         for (let p in plugins) {
@@ -126,7 +134,7 @@
         thisPlugin.isFocused = true;
 
         // now do whatever,  for this plugin,  only addRightPlugin and addLeftPlugin ;
-        let marker = getPickerMarker();
+        marker = getPickerMarker();
         marker?.addRightPlugin(name);
         marker?.addLeftPlugin(name);
         if (marker?.getParams()) {
@@ -147,7 +155,7 @@
 
         makeBottomRightHandle(cornerHandle, mainDiv);
         makeTopLeftHandle(cornerHandleTop, mainDiv);
-       
+
         //// this should not be needed later
         node.querySelector(':scope > .closing-x').addEventListener(
             'click',
@@ -160,7 +168,14 @@
         thisPlugin.defocus = defocus;
     });
 
-    export const onopen = _params => {};
+    export const onopen = _params => {
+        if (_params && 'lon' in _params && !isNaN(_params.lat) && !isNaN(_params.lon)) {
+            // not sure if needed?  Maybe onopen may happen before mount
+            marker = getPickerMarker();
+            marker.openMarker(_params);
+            map.setView(_params);
+        }
+    };
 
     onDestroy(() => {
         mainDiv.remove();
@@ -173,5 +188,5 @@
 </script>
 
 <style lang="less">
-    @import 'da.less?1714942300856';
+    @import 'da.less?1714946410362';
 </style>

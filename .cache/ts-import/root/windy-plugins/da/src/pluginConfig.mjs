@@ -8,7 +8,9 @@ const config = {
     repository: 'github.com/rittels-windy-plugins/windy-plugin-da.git',
     desktopUI: 'embedded',
     mobileUI: 'small',
-    listenToSingleclick: true
+    listenToSingleclick: true,
+    routerPath: '/density-alt/:lat?/:lon?',
+    addToContextmenu: true
     //routerPath: '/my-plugin',
 };
 export default config;
