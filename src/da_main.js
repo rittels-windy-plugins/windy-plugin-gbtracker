@@ -221,6 +221,10 @@ function onMetricChanged() {
 
 function setTs(t) {
     ts = t;
+    let c = pickerT.getParams();
+    if (c) {
+        fetchData(c);
+    }
 }
 
 function setProd(e) {
