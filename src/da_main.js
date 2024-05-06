@@ -277,7 +277,7 @@ function calculate() {
             if (d.ts[i] > ts) {
                 if (i == 0) break;
                 else {
-                    ix = (d.ts[i] - ts) / (d.ts[i] - d.ts[i - 1].ts) < 0.5 ? i : i - 1;
+                    ix = (d.ts[i] - ts) / (d.ts[i] - d.ts[i - 1]) < 0.5 ? i : i - 1;
                     break;
                 }
             }
@@ -411,16 +411,19 @@ function fetchData(c) {
     }
 
 
-
+/*
     if (store.get('overlay') == 'ccl') {
         interpolator(ip => {
             thermal = ip(c)[0] * 3.28084;
             console.log('thermal', thermal);
         });
     } else thermal = null;
+*/
 
     if (datafnd) {
         datafnd = false;
+        c.interpolate=true;
+        c.step=1;
         ftch.getPointForecastData(store.get('product'), c)
             .then(data => {
                 

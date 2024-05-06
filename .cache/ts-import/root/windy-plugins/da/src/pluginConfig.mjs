@@ -1,6 +1,6 @@
 const config = {
     name: 'windy-plugin-da',
-    version: '0.2.5',
+    version: '0.2.7',
     icon: '⛰',
     title: 'Density Alt',
     description: 'The picker shows the density altitude and other information,  provides a multi-picker.',
@@ -11,6 +11,5 @@ const config = {
     listenToSingleclick: true,
     routerPath: '/density-alt/:lat?/:lon?',
     addToContextmenu: true
-    //routerPath: '/my-plugin',
 };
 export default config;
