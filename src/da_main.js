@@ -426,7 +426,7 @@ function fetchData(c) {
         c.step=1;
         ftch.getPointForecastData(store.get('product'), c)
             .then(data => {
-                
+                console.log(data);
                 wxdata = data;
                 wxdata.pos = c;
                 lefta = 1;

@@ -1,3 +1,6 @@
+// default width,  can be overwritten by global.less,  only used to size for tablet
+@width: 400px;
+
 .on@{name} {
     #open-in-app {
         display: none;
@@ -46,30 +49,6 @@
         display: block;
     }
 
-    //Hide it when other plugins open.   Probably missing some
-    /*
-    .ondetail &,
-    .onrplanner &,
-    .onmenu &,
-    .onstation &,
-    .onairport &,
-    .onwebcams-detail &,
-    .onradiosonde & {
-       
-        max-height    : 0px !important;
-        padding-top   : 0px !important;
-        padding-bottom: 0px !important;
-
-        .corner-handle,
-        .corner-handle-top,
-        .closing-x {
-            display: none !important;
-        }
-    }
-    */
-
-
-
     .ondetail &,
     .onrplanner &,
     .onmenu &,
@@ -106,6 +85,14 @@
             top      : 0px;
             margin   : 5px;
             font-size: 20px;
+        }
+    }
+}
+
+@media only screen and (min-width: calc(@width + 20px)) {
+    #device-tablet {
+        #@{name}-info {
+            width: @width;
         }
     }
 }

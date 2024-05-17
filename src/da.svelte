@@ -112,6 +112,7 @@
         getWrapDiv,
         makeBottomRightHandle,
         makeTopLeftHandle,
+        embedForTablet,
     } from './infoWinUtils.js';
     import { getPickerMarker } from './picker.js';
 
@@ -155,6 +156,7 @@
 
         makeBottomRightHandle(cornerHandle, mainDiv);
         makeTopLeftHandle(cornerHandleTop, mainDiv);
+        embedForTablet(thisPlugin);
 
         //// this should not be needed later
         node.querySelector(':scope > .closing-x').addEventListener(
@@ -188,5 +190,5 @@
 </script>
 
 <style lang="less">
-    @import 'da.less?1714978949948';
+    @import 'da.less?1715787699116';
 </style>
