@@ -101,7 +101,9 @@ export function addPickerCtrl(marker) {
     };
 
     marker.fillLeftDiv = (html, pickerBckgCol = false) => {
+        console.log("HTML", html);
         pdl = $("#picker-div-left");
+        console.log(pdl);
         if (!pdl) return;
         if (pickerBckgCol) pdl.style.backgroundColor = 'rgba(68,65,65,0.84)';
         else pdl.style.backgroundColor = 'transparent';

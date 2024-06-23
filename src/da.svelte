@@ -59,11 +59,12 @@
                 <div class="checkbox">Humidity</div>
                 <div class="checkbox">Rain</div>
                 <div class="checkbox checkbox--off">Cloudbase</div>
-                <div class="checkbox checkbox--off">Wx code</div>
+                <!--<div class="checkbox checkbox--off">Wx code</div>-->
                 <div class="checkbox checkbox--off">Wind</div>
                 <div class="checkbox checkbox--off">Gust</div>
             </div>
         </div>
+        <!--
         <br /><br />
         <div>
             <div
@@ -95,6 +96,7 @@
                 </div>
             </div>
         </div>
+    -->
     </div>
 </div>
 
@@ -190,5 +192,5 @@
 </script>
 
 <style lang="less">
-    @import 'da.less?1715787699116';
+    @import 'da.less?1719173735899';
 </style>

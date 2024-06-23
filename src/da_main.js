@@ -272,6 +272,7 @@ function calculate() {
 
 
         let d = wxdata.data.data;
+        console.log(d);
         let ix = 0;
         for (let i = 0; i < d.ts.length; i++) {
             if (d.ts[i] > ts) {
@@ -290,8 +291,8 @@ function calculate() {
             rh = d.rh[ix],
             pressure = d.pressure[ix],
             dewPoint = d.dewPoint[ix],
-            temp = d.temp[ix],
-            weathercode = d.weathercode[ix];
+            temp = d.temp[ix];
+            //weathercode = d.weathercode[ix];
 
         let pressureC = Math.round(pressure) / 100;
         let tempC = Math.round((temp + K) * 10) / 10;
@@ -319,7 +320,7 @@ function calculate() {
             { metric: 'rh', txt: 'Humidity: ', v: rh },
             { metric: 'rain', txt: 'Rain: ', v: rain },
             { metric: 'altitude', txt: 'Cloudbase: ', v: cbase },
-            { metric: '', txt: 'Wx code: ' },
+           // { metric: '', txt: 'Wx code: ' },
             { metric: 'wind', txt: 'Wind: ', v: wind },
             { metric: 'wind', txt: 'Gust: ', v: gust },
         ];
@@ -338,10 +339,12 @@ function calculate() {
         let choices = getChoices();
         vals.forEach(({ metric, txt, v }, i) => {
             if (!choices[i]) return;
+            /*
             if (txt.includes('Wx code')) {
                 ldiv += 'Wx code: ' + parseWxCode(weathercode) + '<br>';
                 return;
             }
+                */
             let m = store.get('metric_' + metric);
             ldiv += `${txt} ${Math.round(W.metrics[metric].conv[m].conversion(v))}${m}`;
             if (txt.includes('Wind')) ldiv += `, ${windDir}°`;
