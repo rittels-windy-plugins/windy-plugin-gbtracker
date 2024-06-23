@@ -141,7 +141,7 @@ let elevPntFcst;
 
 const K = -273.15;
 
-let nVals = 11;
+let nVals = 10;
 
 let ts = Date.now();
 
@@ -153,7 +153,7 @@ store.insert('plugin-da-selected-vals', {
 
 function getChoices() {
     let sv = store.get('plugin-da-selected-vals');
-    if (!(sv || sv === 0)) return Array(11).fill(0).fill(1, 0, 4);
+    if (!(sv || sv === 0)) return Array(10).fill(0).fill(1, 0, 4);
     let choices = ('0000000000000' + store.get('plugin-da-selected-vals').toString(2))
         .slice(-nVals)
         .split('')
