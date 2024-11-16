@@ -192,5 +192,5 @@
 </script>
 
 <style lang="less">
-    @import 'da.less?1719174353212';
+    @import 'da.less?1731746166454';
 </style>
