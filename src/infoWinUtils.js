@@ -2,13 +2,16 @@
 import { isTablet } from '@windy/rootScope';
 import bcast from '@windy/broadcast';
 import { $ } from '@windy/utils';
+import http from '@windy/http';
+import config from './pluginConfig.js';
 
 
 /** 
  * @params el: sensitive element
  * @params onDrag: cbf when dragged,  receives:  hor pixel pos in parent, ver pixel pos in parent, and the original position of the parent of the sens element 
+ * @params onDragEnd:  cbf when drag ended.  
  **/
-function addDrag(el, onDrag) {
+function addDrag(el, onDrag, onDragEnd = () => { }) {
     let topMargin = parseInt(getComputedStyle(el)['margin-top']);
     let leftMargin = parseInt(getComputedStyle(el)['margin-left']);
     let top, topOffs, left, leftOffs;
@@ -26,13 +29,17 @@ function addDrag(el, onDrag) {
         initialParentPos = { pTop, pLeft, pWidth, pHeight };
         mouseDown = true;
     };
-    const handleEnd = () => {
+    const handleEnd = (e) => {
         mouseDown = false;
         document.removeEventListener('mouseup', handleEnd);
         document.removeEventListener('mousemove', handleMove);
+        let pos = e.targetTouches ? e.targetTouches[0] : e;
+        console.log('end', e);
+        onDragEnd(leftOffs + pos.pageX, topOffs + pos.pageY, initialParentPos)
     };
     const handleCancel = e => {
         console.log('cancel', e);
+        onDragEnd();
     };
     /** provides to onDrag fx:  pix moved hor, pix moved ver, original pos of parent of el */
     const handleMove = e => {
@@ -171,4 +178,26 @@ function embedForTablet(thisPlugin) {
     }
 }
 
-export { addDrag, showInfo, getWrapDiv, makeTopLeftHandle, makeBottomRightHandle, embedForTablet };
+// Other stuff used by all my plugins:
+
+// Show message:
+
+function showMsg(messageDiv, m, timeout = 30 * 1000) {
+    messageDiv.innerHTML = m;
+    messageDiv.classList.remove('hidden');
+    if (timeout) setTimeout(() => messageDiv.classList.add('hidden'), timeout);
+    //else do not remove the message 
+}
+
+// Check version
+
+function checkVersion(messageDiv) {
+    http.get('/articles/plugins/list').then(({ data }) => {
+        let newVersion = data.find(e => e.name == config.name).version;
+        if (newVersion !== config.version) {
+            showMsg(messageDiv, `Please Update to version: <b>${newVersion}</b><br>Uninstall the current version (${config.version}) first and then install version ${newVersion} from the Plugin Gallery.`, 60000)
+        }
+    })
+}
+
+export { addDrag, showInfo, getWrapDiv, makeTopLeftHandle, makeBottomRightHandle, embedForTablet, checkVersion, showMsg };
