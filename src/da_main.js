@@ -10,6 +10,7 @@ import { emitter as picker } from '@windy/picker';
 //import rs from '@windy/rootScope';
 import ftch from '@windy/fetch';
 import interpolator from '@windy/interpolator';
+import loc from '@windy/location';
 
 import * as  singleclick from '@windy/singleclick';
 
@@ -17,7 +18,8 @@ import config from './pluginConfig';
 
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
-import { getPickerMarker } from './picker.js';
+import { getPickerMarker } from './picker/picker.js';
+import {checkVersion, showMsg } from './utils/infoWinUtils.js';
 
 const { name } = config;
 const { $, getRefs } = utils;
@@ -26,6 +28,13 @@ let thisPlugin, refs, node;
 
 let hasHooks;
 let pickerT;
+
+let loggerTO;
+function logMessage(msg) {
+    if (!store.get('consent').analytics) return;
+    fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' })
+        .then(console.log);
+}
 
 function init(plgn) {
     thisPlugin = plgn;
@@ -51,6 +60,12 @@ function init(plgn) {
 
     if (hasHooks) return;
 
+    // log message
+    let devMode = loc.getURL().includes('windy.com/dev');
+    logMessage(devMode ? 'open_dev' : 'open_user');
+    if (!devMode) loggerTO = setTimeout(logMessage, 1000 * 60 * 3, '3min');
+    //
+
     // click stuff
     singleclick.singleclick.on(name, pickerT.openMarker);
     bcast.on('pluginOpened', onPluginOpened);
@@ -70,11 +85,15 @@ function init(plgn) {
     // neeeded???
     thisPlugin.closeCompletely = closeCompletely;
 
+    checkVersion(refs.messageDiv);
+
     hasHooks = true;
 };
 
 const closeCompletely = function () {
     console.log('DA close completely');
+
+    clearTimeout(loggerTO);
 
     removeGlobalCss();
 

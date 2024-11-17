@@ -1,4 +1,4 @@
-<div>
+<div class="embed-window">
     <span
         class="checkbox"
         class:checkbox--off={!thisPlugin.isFocused}
@@ -13,6 +13,7 @@
         }}
         style:cursor="pointer">Show density altitude settings</span
     >
+    <div data-ref="messageDiv" class="hidden"></div>
 </div>
 
 <div bind:this={mainDiv} id={`${name}-info`} class="bg-transparent dark-content">
@@ -115,8 +116,8 @@
         makeBottomRightHandle,
         makeTopLeftHandle,
         embedForTablet,
-    } from './infoWinUtils.js';
-    import { getPickerMarker } from './picker.js';
+    } from './utils/infoWinUtils.js';
+    import { getPickerMarker } from './picker/picker.js';
 
     import config from './pluginConfig.js';
     const { title, name } = config;
@@ -185,12 +186,13 @@
         mainDiv.remove();
         document.body.classList.remove(`on${name}-info`);
 
-        //  this should not be needed later,   whole plugin can then be moved into svelte
-        if (!closeButtonClicked) setTimeout(() => thisPlugin.open());
+        //// this should not be needed later,   whole plugin can then be moved into svelte,  open() requires an object
+        if (!closeButtonClicked) setTimeout(() => thisPlugin.open({}));
         else closeCompletely();
+        ////
     });
 </script>
 
 <style lang="less">
-    @import 'da.less?1731746166454';
+    @import 'da.less?1731862107067';
 </style>
