@@ -12,6 +12,7 @@
         }}
         style:cursor="pointer">Show demo plugin info</span
     >
+    <span data-icon=""></span>
     <div data-ref="messageDiv" class="hidden"></div>
 </div>
 
@@ -27,9 +28,11 @@
 
     <div class="scrollable">
         <div class="plugin__title">
-            Demo Plugin: Show elevation and model elevation at the picker.
+            Demo Plugin 
         </div>
-        <div></div>
+        <div>
+            Show elevation and model elevation at the picker
+        </div>
     </div>
 </div>
 
@@ -139,5 +142,5 @@
 </script>
 
 <style lang="less">
-    @import 'demo.less?1735551484980';
+    @import 'demo.less?1735564043041';
 </style>

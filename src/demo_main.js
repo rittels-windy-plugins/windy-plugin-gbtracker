@@ -60,13 +60,6 @@ function init(plgn) {
 
     insertGlobalCss();
 
-    // In iOs Safari, specifically, the user is prompted to open the APP with a large banner above the page.   
-    // If the user opens a plugin,  he does not want to open the APP,  so remove the meta tag.  
-    // 
-
-    let aItunesApp = $("head > meta[name=apple-itunes-app]");
-    if (aItunesApp) aItunesApp.remove();
-
     // the custom picker broadcasts when opened, moved or closed to the same eventer as the internal picker.    
     // picker onDrag is added, it is not native to internal picker,  the second parameter is how much the function is throttled in millisecs
     pickerT.onDrag(someFunction, 300);
