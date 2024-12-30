@@ -17,3 +17,5 @@ To start a new plugin:
 - Make the screenshot.jpg in ./src
 - Write the README.me
 - I think that is about it,  start building!!!
+
+After pushing to repo.   Actions may not always be triggered,  then a small change must be edited to publish-plugin.yml,  like adding an empty line at then end.

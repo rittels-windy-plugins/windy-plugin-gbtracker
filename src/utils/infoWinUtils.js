@@ -5,6 +5,7 @@ import { $ } from '@windy/utils';
 import http from '@windy/http';
 import config from '../pluginConfig.js';
 
+const { log } = console;
 
 /** 
  * @params el: sensitive element
@@ -132,8 +133,10 @@ function makeTopLeftHandle(el, div, callback) {
     addDrag(el, (x, y, pp) => {
         /** current right edge */
         let cr = div.offsetLeft + div.offsetWidth;
+        log("current right", cr);
         /** current bottom edge */
         let cb = div.offsetTop + div.offsetHeight;
+        log("current bottom", cb);
         let l = pp.pLeft + x,
             t = pp.pTop + y;
         if (l < 1) l = 1;
@@ -207,7 +210,7 @@ function checkVersion(messageDiv) {
     http.get('/articles/plugins/list').then(({ data }) => {
         let pluginInList = data.find(e => e.name == config.name);
         if (!pluginInList) {
-            showMsg(messageDiv, config.name+ " is not in the Gallery yet");
+            showMsg(messageDiv, config.name + " is not in the Gallery yet");
             return
         }
         let newVersion = pluginInList.version;
