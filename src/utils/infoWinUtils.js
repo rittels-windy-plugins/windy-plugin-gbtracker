@@ -60,6 +60,9 @@ function addDrag(el, onDrag, onDragEnd = () => { }) {
     });
 }
 
+/** shows the main box
+ * @param {i} name:  is windy-plugin-xxx 
+ */
 function showInfo(name) {
 
     let bdy = document.body;
@@ -181,7 +184,12 @@ function embedForTablet(thisPlugin) {
 // Other stuff used by all my plugins:
 
 // Show message:
-
+/**
+ * 
+ * @param {*} messageDiv - ref to the div
+ * @param {*} m - message
+ * @param {*} timeout - in millisecs 
+ */
 function showMsg(messageDiv, m, timeout = 30 * 1000) {
     messageDiv.innerHTML = m;
     messageDiv.classList.remove('hidden');
@@ -191,9 +199,18 @@ function showMsg(messageDiv, m, timeout = 30 * 1000) {
 
 // Check version
 
+/**
+ * 
+ * @param {*} messageDiv - ref to the message div
+ */
 function checkVersion(messageDiv) {
     http.get('/articles/plugins/list').then(({ data }) => {
-        let newVersion = data.find(e => e.name == config.name).version;
+        let pluginInList = data.find(e => e.name == config.name);
+        if (!pluginInList) {
+            showMsg(messageDiv, config.name+ " is not in the Gallery yet");
+            return
+        }
+        let newVersion = pluginInList.version;
         if (newVersion !== config.version) {
             showMsg(messageDiv, `Please Update to version: <b>${newVersion}</b><br>Uninstall the current version (${config.version}) first and then install version ${newVersion} from the Plugin Gallery.`, 60000)
         }

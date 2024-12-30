@@ -1,6 +1,4 @@
-import type { ExternalPluginConfig } from '@windy/interfaces';
-
-const config: ExternalPluginConfig = {
+const config = {
     name: 'windy-plugin-demo',
     version: '0.0.1',
     icon: 'i',
@@ -14,5 +12,4 @@ const config: ExternalPluginConfig = {
     routerPath: '/elevation/:lat?/:lon?',
     addToContextmenu: true,
 };
-
 export default config;
