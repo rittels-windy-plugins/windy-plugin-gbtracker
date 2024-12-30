@@ -2,7 +2,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-demo',
-    version: '0.0.1',
+    version: '0.0.2',
     icon: 'i',
     title: 'Demo plugin',
     description: 'This is a demo plugin',
