@@ -23,4 +23,6 @@ To start a new plugin (this is mostly for myself):
 
 After pushing to repo.   Actions may not always be visible,  then a small change must be edited to publish-plugin.yml,  like adding an empty line at then end,  so that github sees it.  For the next version just force push,  it does not matter,  gh is now aware of it.
 
+Note:   I modified the `rollup.config.js` and wrote some rollup plugins.  (To allow using a seperate .less file and to insert global.css).   
+
 (This demo plugin just shows the elevation and model elevation for the picker position). 
