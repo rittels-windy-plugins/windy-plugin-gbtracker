@@ -131,8 +131,12 @@ export { init, closeCompletely };
 //// end of boiler plate
 
 function someFunction(e) {
-
-    windyFetch.getPointForecastData(store.get('product'), e).then(({ data }) => {
+    // IMPORTANT:  check if picker has focus,   thus it is the 1st of the leftDivPlugins,  with getLeftPlugin().   If another embedded plugin has been opened it will have priority
+    // Perhaps this check should be included in the picker module,  but for now I am leaving it out.    
+    if (pickerT.getLeftPlugin() !== name) return;
+    let product = store.get('product');
+    if (product=='topoMap') product = 'ecmwf';  // getPointforecast does not work with topoMap
+    windyFetch.getPointForecastData(product, e).then(({ data }) => {
         console.log(data);
         pickerT.fillLeftDiv(
             `Elev: ${data.header.elevation}m<br>Model elev: ${data.header.modelElevation}m`, true);
