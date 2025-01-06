@@ -30,7 +30,10 @@ function logMessage(msg) {
         .then(console.log);
 }
 
-function init(plgn) {
+function init(plgn, cbf) {
+
+    newPickerPos = cbf;  //this is not part of boilerplate,  just to show how to execute fun in the svelte part.   
+
     thisPlugin = plgn;
 
     ({ node } = plgn.window);
@@ -130,15 +133,27 @@ export { init, closeCompletely };
 
 //// end of boiler plate
 
+let newPickerPos = () => { };  //this is cbf which is later imported by init above
+
 function someFunction(e) {
     // IMPORTANT:  check if picker has focus,   thus it is the 1st of the leftDivPlugins,  with getLeftPlugin().   If another embedded plugin has been opened it will have priority
     // Perhaps this check should be included in the picker module,  but for now I am leaving it out.    
     if (pickerT.getLeftPlugin() !== name) return;
     let product = store.get('product');
-    if (product=='topoMap') product = 'ecmwf';  // getPointforecast does not work with topoMap
+    if (product == 'topoMap') product = 'ecmwf';  // getPointforecast does not work with topoMap
     windyFetch.getPointForecastData(product, e).then(({ data }) => {
         console.log(data);
         pickerT.fillLeftDiv(
-            `Elev: ${data.header.elevation}m<br>Model elev: ${data.header.modelElevation}m`, true);
+            `Elev: ${data.header.elevation}m<br>Model elev: ${data.header.modelElevation}m`, true
+        );
+
+        let lat=e.lat.toFixed(3), lon=e.lon.toFixed(3);
+        let posData={
+            lat, lon, elev: data.header.elevation, key:lat+lon
+        } 
+        newPickerPos(posData)
     });
 }
+
+
+export { getPickerHist }

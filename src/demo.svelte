@@ -25,13 +25,30 @@
     ></div>
     <div bind:this={cornerHandle} data-ref="cornerHandle" class="corner-handle"></div>
     <div bind:this={cornerHandleTop} data-ref="cornerHandleTop" class="corner-handle-top"></div>
-
-    <div class="scrollable">
-        <div class="plugin__title">
-            Demo Plugin 
+    <div class="flex-container">
+        <div class="plugin__title">Demo Plugin</div>
+        <div class="scrollable">
+            <!--  this part is just to do something,  shows history of picker pos,  with elev-->
+            <div>Show elevation and model elevation at the picker</div>
+            <div data-ref="pickerHistory">
+                {#each pickerHist as p (p.key)}
+                    <!-- using keys avoids rerendering the whole array  -->
+                    <li>
+                        Lat:{p.lat}, Lon:{p.lon}, Elev:{p.elev}m
+                    </li>
+                {/each}
+            </div>
         </div>
-        <div>
-            Show elevation and model elevation at the picker
+        <div class="plugin__footer">
+            <div class:hidden={infoWinWidth < 380}>
+                {config.name}
+                {config.version},
+                {infoWinWidth}
+            </div>
+            <div  class:hidden={infoWinWidth < 380}>by {config.author}</div>
+            <div class="button">{infoWinWidth <150?"Buy me coffee":"COFFEE"}</div>
+            <div class="button" on:click={toggleFullscreen}>Fullscreen</div>
+            <div class="button">Plugins</div>
         </div>
     </div>
 </div>
@@ -42,6 +59,7 @@
     import { onDestroy, onMount } from 'svelte';
     import plugins from '@windy/plugins';
     import { map } from '@windy/map';
+    import bcast from '@windy/broadcast';
 
     import { init, closeCompletely } from './demo_main.js';
     import {
@@ -51,6 +69,7 @@
         makeBottomRightHandle,
         makeTopLeftHandle,
         embedForTablet,
+        toggleFullscreen
     } from './utils/infoWinUtils.js';
     import { getPickerMarker } from 'custom-windy-picker';
 
@@ -64,6 +83,7 @@
     let cornerHandle, cornerHandleTop;
     let closeButtonClicked;
     let marker;
+    let infoWinWidth = 400;
 
     // the checkbox on the left of the embed-window allows the user to activate the picker for this plugin (focus).
     // The picker will then display info in the left or right picker divs for this plugin.
@@ -89,17 +109,27 @@
         thisPlugin.isFocused = false;
     }
 
+    function onWinWidth(e) {
+    log("EE",e);
+
+        infoWinWidth = e.width;
+    }
+
     onMount(() => {
-        init(thisPlugin);
+        init(thisPlugin, newPickerPos); // newPickerPos is defined later,  not part of boilerplate
         node = thisPlugin.window.node;
 
         //  Info for this plugin is placed in a div appended to document.body,  get wrapDiv gets this div and creates it if needed.
         const wrapDiv = getWrapDiv();
         wrapDiv.appendChild(mainDiv);
 
-        // Add handles to the Info div,  can be resized.
+        // Add handles to the Info div,  can be resized
         makeBottomRightHandle(cornerHandle, mainDiv);
         makeTopLeftHandle(cornerHandleTop, mainDiv);
+
+        // Set infoWinWidth variable
+        bcast.on('infoWinOpened', onWinWidth);
+        bcast.on('infoWinResized', onWinWidth);
 
         // At the moment,  tablets do not show embedded plugins correctly,  this is a fix
         embedForTablet(thisPlugin);
@@ -131,6 +161,8 @@
     onDestroy(() => {
         mainDiv.remove();
         document.body.classList.remove(`on${name}-info`);
+        bcast.off('infoWinOpened', onWinWidth);
+        bcast.off('infoWinResized', onWinWidth);
 
         //// This reopens the plugin if it is closed by another embedded plugin.
         //   It should not be needed later,   then the whole plugin can then be moved into svelte,
@@ -139,8 +171,20 @@
         else closeCompletely();
         ////
     });
+
+    // No longer boiler plate:  Just to do something,  newPickerPos is callback function.
+    // Svelte remains reactive to this.
+    // If the plugin is closed (not the info window),  this will be reset.
+    // To keep the data,  pickerHist must be imported (with a function) from the main module.
+    // It must then be cleared in closeCompletely in the main function.
+    let pickerHist = [];
+
+    function newPickerPos(posData) {
+        pickerHist.push(posData);
+        pickerHist = pickerHist; //svelte is triggered only by var assignment
+    }
 </script>
 
 <style lang="less">
-    @import 'demo.less?1735741348828';
+    @import 'demo.less?1736178939004';
 </style>

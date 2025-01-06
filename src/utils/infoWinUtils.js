@@ -7,6 +7,7 @@ import config from '../pluginConfig.js';
 
 const { log } = console;
 
+
 /** 
  * @params el: sensitive element
  * @params onDrag: cbf when dragged,  receives:  hor pixel pos in parent, ver pixel pos in parent, and the original position of the parent of the sens element 
@@ -122,8 +123,11 @@ function makeBottomRightHandle(el, div, callback) {
         div.style.left = l + 'px';
         div.style.top = t + 'px';
 
+        div.classList.remove("narrow", "medium", "wide");
+        div.classList.add(w < 200 ? "narrow" : w < 380 ? "medium" : "wide");
+
         bcast.fire("infoWinResized", { left: l, top: t, width: w, height: h, id, name });
-        if (callback) callback();  // propably better to use bcast
+        if (callback) callback({ left: l, top: t, width: w, height: h, id, name });  // propably better to use bcast
     });
 }
 
@@ -133,10 +137,8 @@ function makeTopLeftHandle(el, div, callback) {
     addDrag(el, (x, y, pp) => {
         /** current right edge */
         let cr = div.offsetLeft + div.offsetWidth;
-        log("current right", cr);
         /** current bottom edge */
         let cb = div.offsetTop + div.offsetHeight;
-        log("current bottom", cb);
         let l = pp.pLeft + x,
             t = pp.pTop + y;
         if (l < 1) l = 1;
@@ -152,8 +154,11 @@ function makeTopLeftHandle(el, div, callback) {
         div.style.width = w + 'px';
         div.style.height = h + 'px';
 
+        div.classList.remove("narrow", "medium", "wide");
+        div.classList.add(w < 200 ? "narrow" : w < 380 ? "medium" : "wide");
+
         bcast.fire("infoWinResized", { left: l, top: t, width: w, height: h, id, name });
-        if (callback) callback();
+        if (callback) callback({ left: l, top: t, width: w, height: h, id, name });
     });
 }
 
@@ -220,4 +225,47 @@ function checkVersion(messageDiv) {
     })
 }
 
-export { addDrag, showInfo, getWrapDiv, makeTopLeftHandle, makeBottomRightHandle, embedForTablet, checkVersion, showMsg };
+function toggleFullscreen() {
+    if (document.fullscreenElement ||
+        document.webkitFullscreenElement || 
+        document.mozFullScreenElement ||    
+        document.msFullscreenElement
+    ) closeFullscreen();
+    else openFullscreen();
+}
+
+function openFullscreen() {
+    const e = document.documentElement;
+    if (e.requestFullscreen) {
+        e.requestFullscreen();
+    } else if (e.webkitRequestFullscreen) { /* Safari */
+        e.webkitRequestFullscreen();
+    } else if (e.msRequestFullscreen) { /* IE11 */
+        e.msRequestFullscreen();
+    }
+}
+
+/* Close fullscreen */
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+    }
+}
+
+export {
+    addDrag,
+    showInfo,
+    getWrapDiv,
+    makeTopLeftHandle,
+    makeBottomRightHandle,
+    embedForTablet,
+    checkVersion,
+    showMsg,
+    openFullscreen,
+    closeFullscreen,
+    toggleFullscreen
+};
