@@ -12,7 +12,7 @@
         }}
         style:cursor="pointer">Show demo plugin info</span
     >
-    <span data-icon=""></span>
+    <!--<span data-icon=""></span>-->
     <div data-ref="messageDiv" class="hidden"></div>
 </div>
 
@@ -39,17 +39,7 @@
                 {/each}
             </div>
         </div>
-        <div class="plugin__footer">
-            <div class:hidden={infoWinWidth < 380}>
-                {config.name}
-                {config.version},
-                {infoWinWidth}
-            </div>
-            <div  class:hidden={infoWinWidth < 380}>by {config.author}</div>
-            <div class="button">{infoWinWidth <150?"Buy me coffee":"COFFEE"}</div>
-            <div class="button" on:click={toggleFullscreen}>Fullscreen</div>
-            <div class="button">Plugins</div>
-        </div>
+        <Footer onFooterClick={onFooter}/>
     </div>
 </div>
 
@@ -61,6 +51,7 @@
     import { map } from '@windy/map';
     import bcast from '@windy/broadcast';
 
+    import Footer from './utils/Footer.svelte';
     import { init, closeCompletely } from './demo_main.js';
     import {
         addDrag,
@@ -69,7 +60,7 @@
         makeBottomRightHandle,
         makeTopLeftHandle,
         embedForTablet,
-        toggleFullscreen
+        toggleFullscreen,
     } from './utils/infoWinUtils.js';
     import { getPickerMarker } from 'custom-windy-picker';
 
@@ -83,7 +74,8 @@
     let cornerHandle, cornerHandleTop;
     let closeButtonClicked;
     let marker;
-    let infoWinWidth = 400;
+    //let infoWinWidth = 400;
+    //let isFullscreen = false;
 
     // the checkbox on the left of the embed-window allows the user to activate the picker for this plugin (focus).
     // The picker will then display info in the left or right picker divs for this plugin.
@@ -109,10 +101,9 @@
         thisPlugin.isFocused = false;
     }
 
-    function onWinWidth(e) {
-    log("EE",e);
-
-        infoWinWidth = e.width;
+    const onFooter=(open)=> {
+        if (open) log('Footer open');
+        else log('footer closed');
     }
 
     onMount(() => {
@@ -126,10 +117,6 @@
         // Add handles to the Info div,  can be resized
         makeBottomRightHandle(cornerHandle, mainDiv);
         makeTopLeftHandle(cornerHandleTop, mainDiv);
-
-        // Set infoWinWidth variable
-        bcast.on('infoWinOpened', onWinWidth);
-        bcast.on('infoWinResized', onWinWidth);
 
         // At the moment,  tablets do not show embedded plugins correctly,  this is a fix
         embedForTablet(thisPlugin);
@@ -161,8 +148,6 @@
     onDestroy(() => {
         mainDiv.remove();
         document.body.classList.remove(`on${name}-info`);
-        bcast.off('infoWinOpened', onWinWidth);
-        bcast.off('infoWinResized', onWinWidth);
 
         //// This reopens the plugin if it is closed by another embedded plugin.
         //   It should not be needed later,   then the whole plugin can then be moved into svelte,
@@ -186,5 +171,5 @@
 </script>
 
 <style lang="less">
-    @import 'demo.less?1736178939004';
+    @import 'demo.less?1751034305048';
 </style>
