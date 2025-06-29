@@ -12,7 +12,9 @@ import config from './pluginConfig.js';
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
 import { getPickerMarker } from 'custom-windy-picker';
-import { checkVersion, showMsg } from './utils/infoWinUtils.js';
+
+// check version now done by windy
+//import { checkVersion, showMsg } from './utils/infoWinUtils.js';
 
 const { name } = config;
 const { $, getRefs } = utils;
@@ -25,6 +27,7 @@ let pickerT;
 /** logger timeout */
 let loggerTO;
 function logMessage(msg) {
+    if (!store.get('consent')) return;  // store.get('consent') sometimes returns null and nog an object
     if (!store.get('consent').analytics) return;
     fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' })
         .then(console.log);
@@ -72,8 +75,8 @@ function init(plgn, cbf) {
     // This is not needed anymore,  but allows you to close this plugin completely from somewhere else
     thisPlugin.closeCompletely = closeCompletely;
 
-    //  Message to say if plugin is outdated.
-    checkVersion(refs.messageDiv);
+    //  Message to say if plugin is outdated --   Now done by WIndy client
+    //  checkVersion(refs.messageDiv);
 
     hasHooks = true;
 };
@@ -136,21 +139,21 @@ export { init, closeCompletely };
 let newPickerPos = () => { };  //this is cbf which is later imported by init above
 
 function someFunction(e) {
-    // IMPORTANT:  check if picker has focus,   thus it is the 1st of the leftDivPlugins,  with getLeftPlugin().   If another embedded plugin has been opened it will have priority
-    // Perhaps this check should be included in the picker module,  but for now I am leaving it out.    
+    // IMPORTANT!!!!  check if picker has focus,   thus it is the 1st of the leftDivPlugins,  with getLeftPlugin().   If another embedded plugin has been opened it will have priority
+    // todo:Perhaps this check should be included in the picker module,  but for now I am leaving it out.  
+
     if (pickerT.getLeftPlugin() !== name) return;
     let product = store.get('product');
     if (product == 'topoMap') product = 'ecmwf';  // getPointforecast does not work with topoMap
     windyFetch.getPointForecastData(product, e).then(({ data }) => {
-        console.log(data);
         pickerT.fillLeftDiv(
             `Elev: ${data.header.elevation}m<br>Model elev: ${data.header.modelElevation}m`, true
         );
 
-        let lat=e.lat.toFixed(3), lon=e.lon.toFixed(3);
-        let posData={
-            lat, lon, elev: data.header.elevation, key:lat+lon
-        } 
+        let lat = e.lat.toFixed(3), lon = e.lon.toFixed(3);
+        let posData = {
+            lat, lon, elev: data.header.elevation, key: lat + lon
+        }
         newPickerPos(posData)
     });
 }
