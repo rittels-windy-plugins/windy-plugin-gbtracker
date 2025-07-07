@@ -2,7 +2,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-demo',
-    version: '0.0.6',
+    version: '0.0.7',
     icon: 'i',
     title: 'Demo plugin',
     description: 'This is a demo plugin',
@@ -13,6 +13,7 @@ const config: ExternalPluginConfig = {
     listenToSingleclick: true,
     routerPath: '/elevation/:lat?/:lon?',
     addToContextmenu: true,
+    private: true
 };
 
 export default config;
