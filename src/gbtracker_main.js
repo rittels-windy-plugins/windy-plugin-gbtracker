@@ -39,9 +39,8 @@ function logMessage(msg) {
 function init(plgn, selectTeamFun) {
     selectTeam = selectTeamFun;
     loadFlags();
-    Promise.all([getRaceSetup(), getPositions()]).then(showPositions);
 
-    //getRaceSetup();
+    refreshPositions();
 
     thisPlugin = plgn;
 
@@ -92,6 +91,12 @@ function init(plgn, selectTeamFun) {
 
 const closeCompletely = function () {
     flagsSheet.remove();
+
+    positions.forEach(p => {
+        p.line.remove();
+        p.ghostLine.remove();
+    });
+
     clearTimeout(loggerTO);
 
     removeGlobalCss();
@@ -141,7 +146,9 @@ export { init, closeCompletely };
 
 //// end of boiler plate
 
-let teams, ads, positions;
+let teams,
+    ads,
+    positions = [];
 let minmax = [
     [90, 180],
     [-90, -180],
@@ -160,7 +167,6 @@ function getRaceSetup() {
     return fetch('https://cf.yb.tl/JSON/gb2025/RaceSetup')
         .then(r => r.json())
         .then(js => {
-            log('JS', js);
             teams = js.teams;
             ads = js.adverts;
             return js;
@@ -177,11 +183,15 @@ function getPositions() {
 }
 
 function selectPath(id) {
-    log(id);
     let selected = positions.find(p => p.id == id);
-    log(selected);
-    positions.forEach(p2 => p2.line.setStyle({ weight: 3 }));
-    selected.line.setStyle({ weight: 6 });
+    positions.forEach(p2 => p2.line.setStyle({ weight: 2, opacity: 0.8 }));
+    selected.line.setStyle({ weight: 6, opacity: 1.0 });
+}
+
+function placePickerAtEnd(id) {
+    let p = positions.find(p => p.id == id);
+    let fnd = Object.assign({}, p.moments[0], { team: p.team });
+    pickerT.openMarker(fnd);
 }
 
 function showPositions() {
@@ -200,19 +210,18 @@ function showPositions() {
         let team = teams.find(tm => tm.id == p.id);
         p.team = team;
         let color = '#' + team.colour;
-        p.line = L.polyline(latlngs, { color }).addTo(map);
+        p.line = L.polyline(latlngs, { color, weight: 2, opacity: 0.8 }).addTo(map);
 
         p.ghostLine = L.polyline(latlngs, { color: 'transparent', weight: 10 })
             .addTo(map)
             .on('click', ev => {
-                 L.DomEvent.stopPropagation(ev);
+                L.DomEvent.stopPropagation(ev);
                 selectPath(p.id);
                 selectTeam(p.id);
 
                 let found = p.moments.reduce(
                     (a, el, i) => {
                         let r = (ev.latlng.lat - el.lat) ** 2 + (ev.latlng.lng - el.lon) ** 2;
-                        log(r);
                         if (r < a.r) {
                             a.r = r;
                             a.i = i;
@@ -224,20 +233,31 @@ function showPositions() {
 
                 let fnd = Object.assign({}, p.moments[found.i], { team: p.team });
                 pickerT.openMarker(fnd);
-                
             });
     });
-    log(minmax);
+
     map.fitBounds(minmax);
 }
 
+function refreshPositions() {
+    // 1st remove all lines in case of refresh
+    positions.forEach(p => {
+        p.line?.remove();
+        p.ghostLine?.remove();
+    });
+    Promise.all([getRaceSetup(), getPositions()]).then(showPositions);
+}
+
 function pickerEvent(e) {
-    log(pickerT);
-    log('PICKER EVENT',e);
-    if(e.alt){
-        pickerT.fillRightDiv(`${e.team.name}<br>Alt: ${e.alt}<br>At: ${new Date(e.at*1000).toISOString().replace(".000","")}`);
+    
+    if (pickerT.getRightPlugin() !== name) return;
+
+    if (e.alt) {
+        pickerT.fillRightDiv(
+            `${e.team.name}<br>Alt: ${e.alt}<br>At: ${new Date(e.at * 1000).toISOString().replace(':00.000', '')}`,
+        );
     } else {
-        pickerT.fillRightDiv("");
+        pickerT.fillRightDiv('');
     }
 }
 
@@ -307,4 +327,4 @@ function parse(e) {
     return c;
 }
 
-export { getRaceSetup, selectPath };
+export { getRaceSetup, selectPath, placePickerAtEnd, refreshPositions };

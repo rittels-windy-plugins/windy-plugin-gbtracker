@@ -10,7 +10,7 @@
             showInfo(name);
             focus(); // not sure if opening the info,  should focus the picker,  but seems to make sense intuitively
         }}
-        style:cursor="pointer">Show Teams</span
+        style:cursor="pointer">Show Gordon Bennett Teams</span
     >
     <!--<span data-icon=""></span>-->
     <div data-ref="messageDiv" class="hidden"></div>
@@ -27,7 +27,9 @@
     <div bind:this={cornerHandleTop} data-ref="cornerHandleTop" class="corner-handle-top"></div>
     <div class="flex-container">
         <div class="plugin__title">Gordon Bennett</div>
-
+        <div style:margin-bottom="10px" on:click={refreshPositions}>
+            Positions are not live. Click here to refresh.
+        </div>
         <div class="scrollable">
             <div data-ref="teams">
                 {#each teams as tm}
@@ -36,7 +38,8 @@
                         class:selected={selected == tm.id}
                         on:click={() => {
                             selectPath(tm.id);
-                            selected=tm.id;
+                            selected = tm.id;
+                            placePickerAtEnd(tm.id);
                         }}
                     >
                         <div class="bullet" style:background-color={'#' + tm.colour}></div>
@@ -64,7 +67,15 @@
     import bcast from '@windy/broadcast';
 
     import Footer from './utils/Footer.svelte';
-    import { init, closeCompletely, getRaceSetup, selectPath } from './gbtracker_main.js';
+
+    import {
+        init,
+        closeCompletely,
+        getRaceSetup,
+        selectPath,
+        placePickerAtEnd,
+        refreshPositions,
+    } from './gbtracker_main.js';
     import {
         addDrag,
         showInfo,
@@ -113,7 +124,7 @@
         // If you plan to use the left or right div,  add the name of this plugin to the picker,  with the following function:
         // Here I am only using the left Div,  so use .addLeftPlugin(name)
         marker = getPickerMarker();
-        marker?.addLeftPlugin(name);
+        marker?.addRightPlugin(name);
         if (marker?.getParams()) {
             marker.openMarker(marker.getParams());
         }
@@ -190,5 +201,5 @@
 </script>
 
 <style lang="less">
-    @import 'gbtracker.less?1757156973358';
+    @import 'gbtracker.less?1757160995862';
 </style>
