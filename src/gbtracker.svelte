@@ -10,7 +10,7 @@
             showInfo(name);
             focus(); // not sure if opening the info,  should focus the picker,  but seems to make sense intuitively
         }}
-        style:cursor="pointer">Show demo plugin info</span
+        style:cursor="pointer">Show Teams</span
     >
     <!--<span data-icon=""></span>-->
     <div data-ref="messageDiv" class="hidden"></div>
@@ -26,20 +26,32 @@
     <div bind:this={cornerHandle} data-ref="cornerHandle" class="corner-handle"></div>
     <div bind:this={cornerHandleTop} data-ref="cornerHandleTop" class="corner-handle-top"></div>
     <div class="flex-container">
-        <div class="plugin__title">Demo Plugin</div>
+        <div class="plugin__title">Gordon Bennett</div>
+
         <div class="scrollable">
-            <!--  this part is just to do something,  shows history of picker pos,  with elev-->
-            <div>Show elevation and model elevation at the picker</div>
-            <div data-ref="pickerHistory">
-                {#each pickerHist as p (p.key)}
-                    <!-- using keys avoids rerendering the whole array  -->
-                    <li>
-                        Lat:{p.lat}, Lon:{p.lon}, Elev:{p.elev}m
-                    </li>
+            <div data-ref="teams">
+                {#each teams as tm}
+                    <div
+                        class="team"
+                        class:selected={selected == tm.id}
+                        on:click={() => {
+                            selectPath(tm.id);
+                            selected=tm.id;
+                        }}
+                    >
+                        <div class="bullet" style:background-color={'#' + tm.colour}></div>
+                        <div class={'fi fis fi-' + tm.flag.toLowerCase()}></div>
+                        <div>{tm.name}</div>
+                        <div>Pilot: {tm.captain}</div>
+                    </div>
                 {/each}
             </div>
         </div>
-        <Footer onFooterClick={onFooter}/>
+        <div data-ref="ads">
+            <img src={ads[adIx]?.url} />
+        </div>
+
+        <Footer onFooterClick={onFooter} />
     </div>
 </div>
 
@@ -52,7 +64,7 @@
     import bcast from '@windy/broadcast';
 
     import Footer from './utils/Footer.svelte';
-    import { init, closeCompletely } from './demo_main.js';
+    import { init, closeCompletely, getRaceSetup, selectPath } from './gbtracker_main.js';
     import {
         addDrag,
         showInfo,
@@ -65,6 +77,7 @@
     import { getPickerMarker } from 'custom-windy-picker';
 
     import config from './pluginConfig.js';
+
     const { title, name } = config;
     const { log } = console;
 
@@ -74,8 +87,17 @@
     let cornerHandle, cornerHandleTop;
     let closeButtonClicked;
     let marker;
-    //let infoWinWidth = 400;
-    //let isFullscreen = false;
+
+    let interv;
+    let adIx = 0;
+
+    let ads = [];
+    let teams = [];
+    let selected;
+
+    function selectTeam(id) {
+        selected = id;
+    }
 
     // the checkbox on the left of the embed-window allows the user to activate the picker for this plugin (focus).
     // The picker will then display info in the left or right picker divs for this plugin.
@@ -101,14 +123,23 @@
         thisPlugin.isFocused = false;
     }
 
-    const onFooter=(open)=> {
+    const onFooter = open => {
         if (open) log('Footer open');
         else log('footer closed');
-    }
+    };
 
     onMount(() => {
-        init(thisPlugin, newPickerPos); // newPickerPos is defined later,  not part of boilerplate
+        init(thisPlugin, selectTeam);
         node = thisPlugin.window.node;
+
+        getRaceSetup().then(js => {
+            ads = js.adverts;
+            teams = js.teams;
+            interv = setInterval(() => {
+                adIx++;
+                if (adIx >= ads.length) adIx = 0;
+            }, 3000);
+        });
 
         //  Info for this plugin is placed in a div appended to document.body,  get wrapDiv gets this div and creates it if needed.
         const wrapDiv = getWrapDiv();
@@ -156,20 +187,8 @@
         else closeCompletely();
         ////
     });
-
-    // No longer boiler plate:  Just to do something,  newPickerPos is callback function.
-    // Svelte remains reactive to this.
-    // If the plugin is closed (not the info window),  this will be reset.
-    // To keep the data,  pickerHist must be imported (with a function) from the main module.
-    // It must then be cleared in closeCompletely in the main function.
-    let pickerHist = [];
-
-    function newPickerPos(posData) {
-        pickerHist.push(posData);
-        pickerHist = pickerHist; //svelte is triggered only by var assignment
-    }
 </script>
 
 <style lang="less">
-    @import 'demo.less?1751885288675';
+    @import 'gbtracker.less?1757156973358';
 </style>

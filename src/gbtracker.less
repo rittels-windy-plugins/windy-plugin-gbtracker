@@ -1,0 +1,105 @@
+@import 'utils/infoWin_style_svelte.less';
+
+@name: windy-plugin-gbtracker;
+@width: 350px;
+@bottom: 150px;
+
+#@{name}-info {
+    .flex-container {
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+
+        .plugin__title {
+            margin-bottom: 15px; //windy default 25px;
+        }
+
+        // this is not used for the plugin,  but I am leaving it in
+        .scrollable {
+            flex: auto;
+            box-sizing: border-box;
+            position: relative;
+            width: 100%;
+            padding: 0px 10px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+
+            .add-scroll-bar();
+
+            .plugin__title {
+                font-size: 22px !important;
+
+                padding: 5px 0px 10px 0px;
+                position: sticky;
+                top: 0px;
+            }
+
+            .toggle-section {
+                font-size: 15px;
+                margin-bottom: 3px;
+
+                &.checkbox {
+                    &::before {
+                        content: '\u25B7';
+                        top: -0.1em;
+                        font-size: 0.8em;
+                    }
+
+                    & + * {
+                        display: none;
+                    }
+
+                    &.off {
+                        &::before {
+                            content: '\u25BD';
+                            top: -0.1em;
+                            font-size: 0.8em;
+                        }
+
+                        & + * {
+                            display: block;
+                        }
+                    }
+                }
+            }
+        }
+        [data-ref='ads'] {
+            //display:flex;
+            //flex-wrap: wrap;
+            //justify-content: center;
+            //border-radius:5px;
+            //background-color: rgb(127,127,127);
+            img {
+                width: calc(100% - 3px);
+
+                //width:100px;
+                //height:100px;
+                //&.small{
+                //    width:60px;
+                //    height:60px;
+                //}
+            }
+        }
+
+        [data-ref='teams'] {
+            .team {
+                line-height: 1.5em;
+                display: flex;
+                div {
+                    margin-right: 10px;
+                }
+
+                .bullet {
+                    margin-top: 3px;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 10px;
+                }
+                &.selected{
+                    background-color: black;
+                    border-radius:3px;
+                }
+            }
+        }
+    }
+}

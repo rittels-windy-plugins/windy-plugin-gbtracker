@@ -1,6 +1,4 @@
-import type { ExternalPluginConfig } from '@windy/interfaces';
-
-const config: ExternalPluginConfig = {
+const config = {
     name: 'windy-plugin-gbtracker',
     version: '0.0.1',
     icon: 'i',
@@ -15,5 +13,4 @@ const config: ExternalPluginConfig = {
     addToContextmenu: true,
     private: true
 };
-
 export default config;
